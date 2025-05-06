@@ -1,0 +1,28 @@
+---
+services:
+  backend:
+    image: durandj/ek:dev
+
+    build:
+      context: .
+
+    develop:
+      watch:
+        - action: rebuild
+          path: .
+
+    environment:
+      EK_ENVIRONMENT: development
+      EK_LOGGING_LEVEL: info
+      EK_SOURCE_FILEPATH: /source.yml
+
+    volumes:
+      - type: bind
+        source: ./source.yml
+        target: /source.yml
+
+    ports:
+      - name: http
+        protocol: tcp
+        target: 8080
+        published: 8080
