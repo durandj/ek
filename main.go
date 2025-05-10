@@ -37,13 +37,17 @@ func Run() bool {
 		return false
 	}
 
-	server := internal.NewServer(internal.ServerParams{
+	server, err := internal.NewServer(internal.ServerParams{
 		Config: config,
 		Logger: logger,
 		Source: source,
 	})
+	if err != nil {
+		logger.ErrorContext(ctx, "Unable to create server", logging.Err(err))
+	}
+
 	if err := server.Run(ctx); err != nil {
-		logger.Error("Fatal error in server", logging.Err(err))
+		logger.ErrorContext(ctx, "Fatal error in server", logging.Err(err))
 
 		return false
 	}

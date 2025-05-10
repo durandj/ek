@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"net"
 	"net/http"
 	"time"
 
@@ -14,8 +15,9 @@ import (
 )
 
 type Server struct {
-	httpServer *http.Server
-	logger     *slog.Logger
+	httpListener net.Listener
+	httpServer   *http.Server
+	logger       *slog.Logger
 }
 
 type ServerParams struct {
@@ -24,8 +26,14 @@ type ServerParams struct {
 	Source sources.Source
 }
 
-func NewServer(params ServerParams) *Server {
+func NewServer(params ServerParams) (*Server, error) {
+	listener, err := net.Listen("tcp", params.Config.HTTP.Address())
+	if err != nil {
+		return nil, fmt.Errorf("unable to create HTTP listener: %w", err)
+	}
+
 	return &Server{
+		httpListener: listener,
 		httpServer: &http.Server{
 			Addr: params.Config.HTTP.Address(),
 			Handler: web.NewRouter(web.RouterParams{
@@ -49,7 +57,7 @@ func NewServer(params ServerParams) *Server {
 			ErrorLog:                     nil, // TODO: structured logger?
 		},
 		logger: params.Logger,
-	}
+	}, nil
 }
 
 func (server *Server) Run(ctx context.Context) error {
@@ -69,11 +77,15 @@ func (server *Server) Run(ctx context.Context) error {
 		"Starting HTTP server",
 		slog.String("address", server.httpServer.Addr),
 	)
-	if err := server.httpServer.ListenAndServe(); err != nil {
+	if err := server.httpServer.Serve(server.httpListener); err != nil {
 		return fmt.Errorf("error in HTTP server: %w", err)
 	}
 
 	return nil
+}
+
+func (server *Server) Address() string {
+	return server.httpListener.Addr().String()
 }
 
 const readHeaderTimeout = 10 * time.Second

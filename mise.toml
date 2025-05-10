@@ -1,6 +1,7 @@
 [tools]
 go = "1.24.2"
 golangci-lint = "2.1.5"
+gotestsum = "1.12.2"
 hadolint = "2.12.0"
 node = "23.11.0"
 pre-commit = "4.2.0"
