@@ -1,6 +1,8 @@
 package sources
 
-import "context"
+import (
+	"context"
+)
 
 type InMemorySource struct {
 	redirects map[string]Redirect

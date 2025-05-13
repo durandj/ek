@@ -1,10 +1,13 @@
 package web
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"strings"
 
+	"github.com/durandj/ek/internal/logging"
 	"github.com/durandj/ek/internal/sources"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
@@ -38,13 +41,34 @@ func RedirectEndpoint(params RedirectEndpointParams) http.HandlerFunc {
 			return
 		}
 
-		redirectURL := normalizeURL(redirect.URLPattern + "/" + redirectContextPath)
+		redirectURL, err := normalizeURL(redirect.URLPattern + "/" + redirectContextPath)
+		if err != nil {
+			params.Logger.ErrorContext(
+				ctx,
+				"Unable to sanitize redirect URL",
+				logging.Err(err),
+			)
+
+			render.Status(r, http.StatusInternalServerError)
+			render.JSON(w, r, ErrorResponse{
+				Reason: "Unable to get redirect, try again later",
+			})
+
+			return
+		}
 
 		w.Header().Set("Location", redirectURL)
 		w.WriteHeader(http.StatusTemporaryRedirect)
 	}
 }
 
-func normalizeURL(url string) string {
-	return strings.ReplaceAll(url, "//", "/")
+func normalizeURL(urlStr string) (string, error) {
+	parsedURL, err := url.Parse(urlStr)
+	if err != nil {
+		return "", fmt.Errorf("unable to sanitize redirect URL: %w", err)
+	}
+
+	parsedURL.Path = strings.ReplaceAll(parsedURL.Path, "//", "/")
+
+	return parsedURL.String(), nil
 }
