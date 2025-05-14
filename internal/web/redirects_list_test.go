@@ -49,7 +49,10 @@ func TestRedirectsListEndpoint(t *testing.T) {
 
 	go func() {
 		err := httpServer.Run(ctx)
-		require.NoError(t, err, "HTTP server should start successfully")
+
+		if ctx.Err() == nil {
+			require.NoError(t, err, "HTTP server should start successfully")
+		}
 	}()
 
 	httpClient := http.DefaultClient
