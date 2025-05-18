@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"syscall"
 
 	"github.com/durandj/ek/internal"
 	"github.com/durandj/ek/internal/configuration"
@@ -23,7 +24,8 @@ func Run() bool {
 	logger := logging.NewStructuredLoggerFromConfig(config)
 
 	ctx := context.Background()
-	ctx, cancelContext := signal.NotifyContext(ctx, os.Interrupt, os.Kill)
+	ctx, cancelContext := signal.NotifyContext(ctx, syscall.SIGTERM, syscall.SIGINT)
+	// TODO: graceful shutdown timeout (20% of shutdown time [default of 30s])
 	defer cancelContext()
 
 	source, err := sources.NewFileSource(config.Source.FilePath)
