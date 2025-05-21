@@ -14,8 +14,6 @@ jobs:
   publish-release:
     runs-on: ubuntu-latest
 
-    if: ${{ github.event.base_ref == 'refs/heads/main' }}
-
     permissions:
       contents: write
       packages: write
