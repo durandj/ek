@@ -4,11 +4,13 @@ name: Release new version
 on:
   push:
     tags:
-      - v**
+      - v*
 
 jobs:
   publish-release:
     runs-on: ubuntu-latest
+
+    if: ${{ github.event.base_ref == 'refs/heads/main' }}
 
     permissions:
       contents: write
