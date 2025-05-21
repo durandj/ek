@@ -38,14 +38,18 @@ jobs:
 
   tag-release:
     runs-on: ubuntu-latest
+    environment: release
+
     needs: test
+
     permissions:
       contents: write
+
     steps:
       - uses: actions/checkout@v4
 
       - uses: go-semantic-release/action@v1
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PAT_TOKEN }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
