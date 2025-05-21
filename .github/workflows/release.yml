@@ -6,6 +6,10 @@ on:
     tags:
       - v*
 
+  release:
+    types:
+      - released
+
 jobs:
   publish-release:
     runs-on: ubuntu-latest
