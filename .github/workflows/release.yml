@@ -2,8 +2,9 @@
 name: Release new version
 
 on:
-  create:
+  push:
     tags:
+      - "v*"
 
 jobs:
   publish-release:
