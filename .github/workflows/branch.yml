@@ -33,3 +33,8 @@ jobs:
         with:
           tags: durandj/ek:ci
           push: false
+
+      - uses: goreleaser/goreleaser-action@v6
+        with:
+          version: latest
+          args: check

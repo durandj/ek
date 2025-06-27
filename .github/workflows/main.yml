@@ -36,6 +36,11 @@ jobs:
           tags: durandj/ek:ci
           push: false
 
+      - uses: goreleaser/goreleaser-action@v6
+        with:
+          version: latest
+          args: check
+
   tag-release:
     runs-on: ubuntu-latest
     environment: release
